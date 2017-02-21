@@ -57,8 +57,8 @@ pivot length j i m = pivot' m
             iRow <- indexFl i m'
             jRow <- indexFl j m'
 
-            pure $ Matrix (flip iRow jRow m')
-    flip row1 row2 =
+            pure $ Matrix (flipRows iRow jRow m')
+    flipRows row1 row2 =
       map (\r -> if r == row1 then row2 else if r == row2 then row1 else id r)
     m' = unwrap m
 
