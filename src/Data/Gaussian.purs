@@ -72,7 +72,7 @@ gauss' i m =
       if iElem == 0.0
         then do
           mP   <- pivot     n (i + 1) i m
-          newM <- eliminate n (i + 1) i m
+          newM <- eliminate n (i + 1) i mP
           gauss' (i + 1) newM
         else do
           newM <- eliminate n (i + 1) i m
