@@ -14,6 +14,12 @@ newtype Matrix = Matrix (Array Row)
 
 derive instance newtypeMatrix :: Newtype Matrix _
 
+instance showMatrix :: Show Matrix where
+  show m = "Matrix " <> show (unwrap m)
+
+instance eqMatrix :: Eq Matrix where
+  eq m1 m2 = unwrap m1 == unwrap m2
+
 type Length = Int
 
 indexFl :: forall a. Int -> Array a -> Maybe a
@@ -78,9 +84,6 @@ gauss' i m =
     m'  = unwrap m
     nI  = length m' - 1
     n   = length m'
-
-addToM :: Array Number -> Matrix -> Matrix
-addToM xs (Matrix m) = Matrix $ snoc m xs
 
 foreign import solver :: Int -> Matrix -> Array Number
 
