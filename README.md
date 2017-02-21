@@ -15,7 +15,7 @@ x  + y     = 1
 Filling in the coefficients and the constant results in the following augmented matrix:
 
 ```purescript
-Matrix
+let m = Matrix
  [ [  1.0, 0.0, -1.0, 0.0 ]
  , [  1.0, 1.0,  0.0, 1.0 ]
  , [ -1.0, 1.0,  1.0, 4.0 ]
@@ -24,6 +24,7 @@ Matrix
 
 Pass this to the `gauss` function defined in `Data.Gaussian`, and the result will be:
 ```purescript
+> gauss m
 [ -1.0, 4.0, -1.0 ]
 ```
 wrapped in an `Either`.
