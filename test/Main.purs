@@ -2,18 +2,24 @@ module Test.Main where
 
 import Control.Monad.Eff.Console (log)
 import Test.Unit.Assert as Assert
-import Data.Gaussian (Matrix(..), isSufficient)
+import Data.Gaussian (Matrix(..), gauss)
+import Data.Either (fromRight)
 import Test.Unit (suite, test)
 import Test.Unit.Main (runTest)
+import Partial.Unsafe (unsafePartial)
+import Prelude (negate, bind, ($))
 
-main = runTest do
-  suite "basic functions" do
-    test "All rows in matrix have same length" do
-      Assert.equal (isSufficient m) true
+main = unsafePartial $ runTest do
+  suite "algorithm" do
+    test "Outcome" do
+      Assert.equal (fromRight $ gauss m1) [ 2.0, 3.0 ]
+      Assert.equal (fromRight $ gauss m2) [ -1.0, 4.0, -1.0 ]
   where
-    m = Matrix [ [1.0, 2.0, 3.0]
-               , [2.0, 3.0, 4.0]
-               , [4.0, 5.0, 1.0]
-               ]
--- main = do
---   log "hey"
+    m1 = Matrix [ [ 2.0, 3.0,  13.0 ]
+                , [ 1.0, -1.0, -1.0 ]
+                ]
+
+    m2 = Matrix [ [  1.0, 0.0, -1.0, 0.0 ]
+                , [  3.0, 1.0,  0.0, 1.0 ]
+                , [ -1.0, 1.0,  1.0, 4.0 ]
+                ]
