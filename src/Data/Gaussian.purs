@@ -1,13 +1,10 @@
 module Data.Gaussian where
 
-import Data.Array
-import Data.Either
-import Data.Int (toNumber)
-import Data.Maybe (Maybe(..), maybe, fromMaybe)
+import Data.Array (index, length, nubBy, zipWith)
+import Data.Either (Either(..))
+import Data.Maybe (Maybe, maybe)
 import Data.Newtype (class Newtype, unwrap)
-import Data.Traversable
-import Data.Tuple (Tuple(..), fst, snd)
-import Prelude
+import Prelude (class Eq, class Show, bind, flip, id, join, map, not, pure, show, ($), (*), (+), (-), (/), (<$>), (<<<), (<>), (==))
 
 type Row       = Array Number
 newtype Matrix = Matrix (Array Row)
@@ -90,8 +87,9 @@ foreign import solver :: Int -> Matrix -> Array Number
 gauss :: Matrix -> Either String (Array Number)
 gauss m = if not $ isMatrix m
   then Left "Matrix incorrect"
-  else maybe (Left "wrong") Right (solver (length $ unwrap m) <$> gauss' 0 m)
+  else maybe (Left "Couldn't calculate") Right result
   where
+    result = solver (length $ unwrap m) <$> gauss' 0 m
     isMatrix = (==) 1
            <<< length
            <<< nubBy (\xs ys -> length xs == length ys)
