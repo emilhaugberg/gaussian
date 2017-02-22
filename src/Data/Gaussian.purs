@@ -1,10 +1,10 @@
 module Data.Gaussian where
 
-import Data.Array (index, length, nubBy, zipWith)
+import Data.Array (index, length, nubBy, zipWith, snoc, cons)
 import Data.Either (Either(..))
-import Data.Maybe (Maybe, maybe)
+import Data.Maybe (Maybe, maybe, fromMaybe)
 import Data.Newtype (class Newtype, unwrap)
-import Prelude (class Eq, class Show, bind, flip, id, join, map, not, pure, show, ($), (*), (+), (-), (/), (<$>), (<<<), (<>), (==))
+import Prelude (class Eq, class Show, bind, flip, id, join, map, not, pure, show, negate, ($), (*), (+), (-), (/), (<$>), (<<<), (<>), (==), (=<<), (<))
 
 type Row       = Array Number
 newtype Matrix = Matrix (Array Row)
@@ -25,14 +25,17 @@ indexFl = flip index
 subtractRow :: Row -> Row -> Row
 subtractRow = zipWith (-)
 
+findElement2 :: forall a. Int -> Int -> Array (Array a) -> Maybe a
+findElement2 i j xs = join $ indexFl j <$> (indexFl i xs)
+
 eliminate :: Length -> Int -> Int -> Matrix -> Maybe Matrix
 eliminate length k i m = eliminate' m
   where
     eliminate' m = if k == length
       then pure $ id m
       else do
-        kElem <- join $ indexFl i <$> (indexFl k m')
-        iElem <- join $ indexFl i <$> (indexFl i m')
+        kElem <- findElement2 k i m'
+        iElem <- findElement2 i i m'
         kRow  <- indexFl k m'
         iRow  <- indexFl i m'
 
@@ -49,7 +52,7 @@ pivot length j i m = pivot' m
     pivot' m = if j == length
       then pure $ id m
       else do
-        jElem <- join $ indexFl i <$> (indexFl j m')
+        jElem <- findElement2 j i m'
 
         if jElem == 0.0
           then pivot length (j + 1) i m
@@ -67,7 +70,7 @@ gauss' i m =
   if i == n - 1
     then pure $ id m
     else do
-      iElem <- join $ indexFl i <$> (indexFl i m')
+      iElem <- findElement2 i i m'
 
       if iElem == 0.0
         then do
@@ -79,7 +82,6 @@ gauss' i m =
           gauss' (i + 1) newM
   where
     m'  = unwrap m
-    nI  = length m' - 1
     n   = length m'
 
 foreign import solver :: Int -> Matrix -> Array Number
@@ -89,7 +91,8 @@ gauss m = if not $ isMatrix m
   then Left "Matrix incorrect"
   else maybe (Left "Couldn't calculate") Right result
   where
-    result = solver (length $ unwrap m) <$> gauss' 0 m
+    result = solver length' <$> gauss' 0 m
+    length' = (length $ unwrap m)
     isMatrix = (==) 1
            <<< length
            <<< nubBy (\xs ys -> length xs == length ys)
