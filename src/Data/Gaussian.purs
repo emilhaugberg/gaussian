@@ -6,7 +6,7 @@ import Data.Maybe (Maybe, maybe, fromMaybe)
 import Data.Newtype (class Newtype, unwrap)
 import Prelude (class Eq, class Show, bind, flip, id, join, map, not, pure, show, negate, ($), (*), (+), (-), (/), (<$>), (<<<), (<>), (==), (=<<), (<))
 
-type Row       = Array Number
+type    Row    = Array Number
 newtype Matrix = Matrix (Array Row)
 
 derive instance newtypeMatrix :: Newtype Matrix _
@@ -25,34 +25,34 @@ indexFl = flip index
 subtractRow :: Row -> Row -> Row
 subtractRow = zipWith (-)
 
-findElement2 :: forall a. Int -> Int -> Array (Array a) -> Maybe a
-findElement2 i j xs = join $ indexFl j <$> (indexFl i xs)
+index2 :: forall a. Int -> Int -> Array (Array a) -> Maybe a
+index2 i j xs = join $ indexFl j <$> (indexFl i xs)
 
 eliminate :: Length -> Int -> Int -> Matrix -> Maybe Matrix
 eliminate length k i m = eliminate' m
   where
     eliminate' m = if k == length
-      then pure $ id m
+      then pure m
       else do
-        kElem <- findElement2 k i m'
-        iElem <- findElement2 i i m'
+        kElem <- index2 k i m'
+        iElem <- index2 i i m'
         kRow  <- indexFl k m'
         iRow  <- indexFl i m'
 
-        let r         = kElem / iElem
-        let newKRow   = subtractRow (map ((*) r) iRow) kRow
-        let newRows   = map (\r -> if r == kRow then newKRow else id r) m'
+        let r       = kElem / iElem
+        let newKRow = subtractRow (map ((*) r) iRow) kRow
+        let newRows = map (\r -> if r == kRow then newKRow else id r) m'
 
-        eliminate length (k + 1) i (Matrix (newRows))
+        eliminate length (k + 1) i (Matrix newRows)
     m' = unwrap m
 
 pivot :: Length -> Int -> Int -> Matrix -> Maybe Matrix
 pivot length j i m = pivot' m
   where
     pivot' m = if j == length
-      then pure $ id m
+      then pure m
       else do
-        jElem <- findElement2 j i m'
+        jElem <- index2 j i m'
 
         if jElem == 0.0
           then pivot length (j + 1) i m
@@ -70,7 +70,7 @@ gauss' i m =
   if i == n - 1
     then pure $ id m
     else do
-      iElem <- findElement2 i i m'
+      iElem <- index2 i i m'
 
       if iElem == 0.0
         then do
