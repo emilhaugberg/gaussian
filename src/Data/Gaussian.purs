@@ -68,17 +68,11 @@ pivot length j i m = pivot' m
 gauss' :: Int -> Matrix -> Maybe Matrix
 gauss' i m =
   if i == n - 1
-    then pure m
-    else do
+    then pure m else do
       iElem <- index2 i i m'
-
-      let eliminateMatrix = eliminate n (i + 1) i
-
-      newMatrix <- if iElem == 0.0
-        then eliminateMatrix =<< pivot n (i + 1) i m
-        else eliminateMatrix m
-
-      gauss' (i + 1) newMatrix
+      gauss' (i + 1) =<< eliminate n (i + 1) i =<< if iElem == 0.0
+        then pivot n (i + 1) i m
+        else pure m
   where
     m'  = unwrap m
     n   = length m'
